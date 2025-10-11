@@ -5,44 +5,51 @@ import io.github.kxng0109.linkzip.repository.UrlMappingRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 
 @Service
 public class UrlShorteningServiceImpl implements UrlShorteningService {
 
-    private final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private final int SHORT_CODE_LENGTH = 7;
-    private final SecureRandom random = new SecureRandom();
+    private static final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int SHORT_CODE_LENGTH = 7;
+    private static final SecureRandom random = new SecureRandom();
 
-    private UrlMappingRepository urlMappingRepository;
+    private final UrlMappingRepository urlMappingRepository;
 
-    public UrlShorteningServiceImpl(UrlMappingRepository umr){
-        this.urlMappingRepository = umr;
+    public UrlShorteningServiceImpl(UrlMappingRepository urlMappingRepository){
+        this.urlMappingRepository = urlMappingRepository;
     }
 
     @Override
-    public UrlMapping shortenUrl(String originalUrl) {
-        String shortenedUrl = generateUniqueShortUrl();
+    public UrlMapping shortenUrl(String longUrl) {
+        String shortCode = generateUniqueShortCode();
 
         UrlMapping urlMapping = UrlMapping.builder()
-                .originalUrl(originalUrl)
-                .shortenUrl(shortenedUrl)
+                .longUrl(longUrl)
+                .shortCode(shortCode)
                 .build();
 
         return urlMappingRepository.save(urlMapping);
     }
 
+    @Override
+    public Optional<String> getLongUrlByShortCode(String shortCode) {
+       return urlMappingRepository.findByShortCode(shortCode)
+               .map(UrlMapping::getLongUrl);
+    }
+
     /*Generates and return a pseudo random short url as long as it's not in the database*/
-    private String generateUniqueShortUrl() {
-        String shortenedUrl = "";
+    private String generateUniqueShortCode() {
+        String shortCode = "";
         do {
             StringBuilder builder = new StringBuilder(SHORT_CODE_LENGTH);
             for (int i = 0; i < SHORT_CODE_LENGTH; i++) {
                 int randomIndex = random.nextInt(ALLOWED_CHARACTERS.length());
                 builder.append(ALLOWED_CHARACTERS.charAt(randomIndex));
             }
-            shortenedUrl = builder.toString();
+            shortCode = builder.toString();
         }
-        while (urlMappingRepository.existsByShortenUrl(shortenedUrl));
-        return shortenedUrl;
+        while (urlMappingRepository.existsByShortCode(shortCode));
+        return shortCode;
     }
 }

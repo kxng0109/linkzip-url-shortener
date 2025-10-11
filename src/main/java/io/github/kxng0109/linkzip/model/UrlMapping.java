@@ -20,10 +20,10 @@ public class UrlMapping {
     public long id;
 
     @Column(name = "long_url", nullable = false, length = 1024)
-    public String originalUrl;
+    public String longUrl;
 
     @Column(name = "short_code",  nullable = false, length = 1024, unique = true)
-    public String shortenUrl;
+    public String shortCode;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     public LocalDateTime createdAt;
