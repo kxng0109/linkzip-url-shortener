@@ -1,104 +1,100 @@
-# LinkZip: A Simple URL Shortener 🚀
+# LinkZip: A Robust URL Shortener API
 
-LinkZip is a lightweight and efficient URL shortening service built with Java and Spring Boot. It provides a simple REST API to convert long, cumbersome URLs into short, easy-to-share links. The application is designed for performance and scalability, with robust validation and a clear separation of concerns.
+LinkZip is a powerful and lightweight URL shortening service built from the ground up using Java and the Spring Boot framework. It provides a clean, RESTful API to convert long, unwieldy URLs into short, shareable links, which seamlessly redirect users to their original destinations. The application is designed for performance and scalability, with robust validation and a clear separation of concerns.
 
-This version uses an in-memory H2 database, making it easy to run and test without any external database setup.
+This project demonstrates modern backend development principles, including a clear service-oriented architecture, robust testing, and professional configuration management. It leverages Spring Profiles to seamlessly switch between a persistent PostgreSQL database for development and a lightweight H2 in-memory database for automated testing.
 
 ## Key Features
 
-* Shorten any URL: Convert a long URL into a short, unique code.
-* Fast redirects: Automatically redirects short links to their original destination.
-* RESTful API: A clean and simple API for programmatic access.
-* Robust input validation: Ensures that submitted data is well-formed and returns clear error messages.
-* Zero-setup database: Uses H2 in-memory database for immediate use.
-* Well-tested: Includes unit and integration tests to ensure reliability.
+* RESTful API: Exposes endpoints for creating short links (`POST`) and handling redirects (`GET`).
+* Persistent Storage: Uses a Dockerized PostgreSQL database to ensure link data is saved permanently.
+* Profile-Based DB Configuration: Automatically switches between PostgreSQL (for `dev`) and H2 (for `test`) using Spring Profiles.
+* Secure Configuration: Avoids committing secrets by loading database credentials from environment variables.
+* Robust Input Validation: Ensures all incoming data is well-formed and returns clean error messages via a global exception handler.
+* Well-Tested: Includes a full suite of unit and integration tests to ensure reliability and code quality.
 
 ## Built With
 
-* Java 25
-* Spring Boot 3
-* Spring Data JPA
+* Java 25 & Spring Boot 3.5.6
+* Spring Data JPA & Hibernate
 * Bean Validation (Hibernate Validator)
-* H2 Database (development and testing)
-* JUnit 5 & Mockito (testing)
-* Maven
+* Databases: PostgreSQL (dev), H2 (test)
+* Testing: JUnit 5 & Mockito
+* Containerization: Docker
+* Build Tool: Maven
 
 ## API Usage
 
+*(This section remains the same as the API contract has not changed)*
+
 ### Shorten a URL
 
-Creates a new short link.
+**Endpoint**: `POST /api/v1/shorten`
 
-**Endpoint**
+**Success (201 Created)**: Returns a JSON object with the full short URL.
 
-`POST /api/v1/shorten`
-
-**Request Body**
-
-```json
-{
-  "longUrl": "https://www.very-long-and-complicated-url.com/with/some/path"
-}
-```
-
-**Success Response (201 Created)**
-
-```json
-{
-  "shortUrl": "http://localhost:8080/aB1xZ9pL"
-}
-```
-
-**Failure Response (400 Bad Request)**
-
-If the `longUrl` is missing or invalid:
-
-```json
-{
-  "longUrl": "A valid URL format is required"
-}
-```
+**Failure (400 Bad Request)**: Returns a JSON object with validation errors if the URL is invalid.
 
 ### Redirect to Original URL
 
-Redirects to the original long URL associated with a short code.
+**Endpoint**: `GET /{shortCode}`
 
-**Endpoint**
+**Success (302 Found)**: Redirects the client to the original long URL.
 
-`GET /{shortCode}`
-
-**Example**
-
-`GET /aB1xZ9pL`
-
-**Success Response**
-
-An HTTP 302 Found redirect to the original URL.
-
-**Failure Response**
-
-HTTP 404 Not Found if the `shortCode` does not exist.
+**Failure (404 Not Found)**: Returns a `404 Not Found` status if the code does not exist.
 
 ## Getting Started
 
-To get a local copy up and running, follow these steps.
+To get a local copy up and running, please follow these steps.
 
 ### Prerequisites
 
 * JDK 25 or later
 * Maven
+* Docker and Docker Compose
 
 ### Installation & Setup
 
 ```bash
 git clone https://github.com/kxng0109/linkzip-url-shortener.git
 cd linkzip
+```
+
+Run PostgreSQL in Docker:
+
+```bash
+docker run --name linkzip-db \
+  -e POSTGRES_PASSWORD=mysecretpassword \
+  -p 5432:5432 \
+  -d postgres:18
+```
+
+Next, connect to the container and create the database:
+
+```bash
+docker exec -it linkzip-db psql -U postgres
+# Now, inside the psql shell, run:
+CREATE DATABASE linkzip_db;
+```
+
+### Configure Local Environment
+
+This project uses environment variables to handle secrets securely.
+
+* Create a new file named `application-dev.properties` inside `src/main/resources`. You can copy the contents from `application-dev.properties.example`.
+* Set the `POSTGRES_PASSWORD` environment variable on your system or in your IDE's run configuration to match the password from the `docker run` command (for example, `mysecretpassword`).
+
+Run the application:
+
+```bash
 mvn spring-boot:run
 ```
 
 The application will be available at `http://localhost:8080`.
 
-Run tests:
+### Running Tests
+
+To run the full suite of unit and integration tests (which will use the H2 database):
 
 ```bash
 mvn test
@@ -106,10 +102,8 @@ mvn test
 
 ## Future Enhancements
 
-* [ ] Integrate PostgreSQL for persistent storage.
-
+* [x] Integrate PostgreSQL for persistent storage.
 * [ ] Implement user accounts with Spring Security to manage links.
-
 * [ ] Add click tracking and analytics for each link.
 
 ## License
