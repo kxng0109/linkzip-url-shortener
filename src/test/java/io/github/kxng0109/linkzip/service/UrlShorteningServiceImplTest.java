@@ -43,7 +43,7 @@ public class UrlShorteningServiceImplTest {
         assertNotNull(result);
         assertEquals(longUrl, result.getLongUrl());
         assertNotNull(result.getShortCode());
-        assertEquals(7, result.getShortCode().length());
+        assertEquals(8, result.getShortCode().length());
 
         verify(urlMappingRepository).save(any(UrlMapping.class));
         verify(urlMappingRepository).existsByShortCode(any(String.class));

@@ -11,7 +11,7 @@ import java.util.Optional;
 public class UrlShorteningServiceImpl implements UrlShorteningService {
 
     private static final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final int SHORT_CODE_LENGTH = 7;
+    private static final int SHORT_CODE_LENGTH = 8;
     private static final SecureRandom random = new SecureRandom();
 
     private final UrlMappingRepository urlMappingRepository;
