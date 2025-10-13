@@ -25,23 +25,59 @@ This project demonstrates modern backend development principles, including a cle
 
 ## API Usage
 
-*(This section remains the same as the API contract has not changed)*
-
 ### Shorten a URL
 
-**Endpoint**: `POST /api/v1/shorten`
+Creates a new short link.
 
-**Success (201 Created)**: Returns a JSON object with the full short URL.
+**Endpoint**
 
-**Failure (400 Bad Request)**: Returns a JSON object with validation errors if the URL is invalid.
+`POST /api/v1/shorten`
+
+**Request Body**
+
+```json
+{
+  "longUrl": "https://www.very-long-and-complicated-url.com/with/some/path"
+}
+```
+
+**Success Response (201 Created)**
+
+```json
+{
+  "shortUrl": "http://localhost:8080/aB1xZ9pL"
+}
+```
+
+**Failure Response (400 Bad Request)**
+
+If the `longUrl` is missing or invalid:
+
+```json
+{
+  "longUrl": "A valid URL format is required"
+}
+```
 
 ### Redirect to Original URL
 
-**Endpoint**: `GET /{shortCode}`
+Redirects to the original long URL associated with a short code.
 
-**Success (302 Found)**: Redirects the client to the original long URL.
+**Endpoint**
 
-**Failure (404 Not Found)**: Returns a `404 Not Found` status if the code does not exist.
+`GET /{shortCode}`
+
+**Example**
+
+`GET /aB1xZ9pL`
+
+**Success Response**
+
+An HTTP 302 Found redirect to the original URL.
+
+**Failure Response**
+
+HTTP 404 Not Found if the `shortCode` does not exist.
 
 ## Getting Started
 
